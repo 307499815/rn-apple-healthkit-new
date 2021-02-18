@@ -406,4 +406,36 @@
     }];
 }
 
+- (void)getWaterOnTime:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback
+{
+    NSDate *date = [RCTAppleHealthKit dateFromOptions:input key:@"date" withDefault:[NSDate date]];
+
+    if(date == nil) {
+        callback(@[RCTMakeError(@"could not parse date from options.date", nil, nil)]);
+        return;
+    }
+
+    HKQuantityType *waterType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDietaryWater];
+    HKUnit *waterUnit = [HKUnit literUnitWithMetricPrefix:HKMetricPrefixMilli];
+
+    [self fetchSumOfSamplesOnTimeForType:waterType
+                                   unit:waterUnit
+                                    time:date
+                             completion:^(double value, NSDate *startDate, NSDate *endDate, NSError *error) {
+                                 if (!value) {
+                                     NSLog(@"could not fetch water for day: %@", error);
+                                     callback(@[RCTMakeError(@"could not fetch water for day", error, nil)]);
+                                     return;
+                                 }
+
+                                 NSDictionary *response = @{
+                                                            @"value" : @(value),
+                                                            @"startDate" : [RCTAppleHealthKit buildISO8601StringFromDate:startDate],
+                                                            @"endDate" : [RCTAppleHealthKit buildISO8601StringFromDate:endDate],
+                                                            };
+
+                                 callback(@[[NSNull null], response]);
+                             }];
+}
+
 @end
