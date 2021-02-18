@@ -390,7 +390,7 @@
     double waterValue = [RCTAppleHealthKit doubleFromOptions:input key:@"water" withDefault:(double)0];
 
     HKQuantitySample* water = [HKQuantitySample quantitySampleWithType:[HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierDietaryWater]
-                                                                quantity:[HKQuantity quantityWithUnit:[HKUnit literUnit] doubleValue:waterValue]
+                                                                quantity:[HKQuantity quantityWithUnit:[HKUnit literUnitWithMetricPrefix:HKMetricPrefixMilli] doubleValue:waterValue]
                                                                 startDate:timeWaterWasConsumed
                                                                 endDate:timeWaterWasConsumed
                                                                 metadata:nil];
