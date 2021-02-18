@@ -65,4 +65,7 @@
                                    limit:(NSUInteger)lim
                                    completion:(void (^)(NSArray *, NSError *))completion;
 
+- (void)fetchSumOfSamplesOnTimeForType:(HKQuantityType *)quantityType unit:(HKUnit *)unit time:(NSDate *)day completion:(void (^)(double, NSDate *, NSDate *, NSError *))completionHandler;
+
+
 @end
