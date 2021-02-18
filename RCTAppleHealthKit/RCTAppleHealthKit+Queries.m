@@ -653,4 +653,28 @@
     [self.healthStore executeQuery:query];
 }
 
+- (void)fetchSumOfSamplesOnTimeForType:(HKQuantityType *)quantityType
+                                 unit:(HKUnit *)unit
+                                  time:(NSDate *)time
+                           completion:(void (^)(double, NSDate *, NSDate *, NSError *))completionHandler {
+
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDate *endDate = [calendar dateByAddingUnit:NSCalendarUnitSecond value:2 toDate:time options:0];
+
+    NSPredicate *predicate = [RCTAppleHealthKit predicateForSamplesBetweenDates:time endDate:endDate];
+    HKStatisticsQuery *query = [[HKStatisticsQuery alloc] initWithQuantityType:quantityType
+                                                          quantitySamplePredicate:predicate
+                                                          options:HKStatisticsOptionCumulativeSum
+                                                          completionHandler:^(HKStatisticsQuery *query, HKStatistics *result, NSError *error) {
+                                                              HKQuantity *sum = [result sumQuantity];
+                                                              NSDate *startDate = result.startDate;
+                                                              NSDate *endDate = result.endDate;
+                                                              if (completionHandler) {
+                                                                     double value = [sum doubleValueForUnit:unit];
+                                                                     completionHandler(value,startDate, endDate, error);
+                                                              }
+                                                          }];
+
+    [self.healthStore executeQuery:query];
+}
 @end
